@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional CV Generator - Create ATS-Optimized Resumes</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- ADDED: jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- html2pdf.bundle.js includes its own jsPDF, but doesn't expose it globally. We keep it for reference or other features. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="container">
+                <h1>Professional CV Generator</h1>
+                <p>Create ATS-optimized resumes that get you hired</p>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="cv-builder">
+                <!-- Left Sidebar - Form -->
+                <div class="form-sidebar">
+                    <div class="template-selector mb-24">
+                        <h3>Choose Template</h3>
+                        <div class="template-options">
+                            <button type="button" class="template-btn active" data-template="classic">
+                                <strong>Classic Chronological</strong>
+                                <span>ATS-optimized traditional format</span>
+                            </button>
+                            <button type="button" class="template-btn" data-template="modern">
+                                <strong>Modern Clean</strong>
+                                <span>Clean design with subtle accent</span>
+                            </button>
+                            <button type="button" class="template-btn" data-template="minimal">
+                                <strong>Professional Minimal</strong>
+                                <span>Minimalist black and white</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="cv-form" class="cv-form">
+                        <!-- Contact Information -->
+                        <section class="form-section active" id="contact-section">
+                            <h3>Contact Information</h3>
+                            <div class="form-group">
+                                <label for="fullName" class="form-label">Full Name *</label>
+                                <input type="text" id="fullName" name="fullName" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" id="email" name="email" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Phone Number *</label>
+                                <input type="tel" id="phone" name="phone" class="form-control" placeholder="(555) 123-4567" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="location" class="form-label">Location</label>
+                                <input type="text" id="location" name="location" class="form-control" placeholder="City, State">
+                            </div>
+                            <div class="form-group">
+                                <label for="linkedin" class="form-label">LinkedIn Profile</label>
+                                <input type="url" id="linkedin" name="linkedin" class="form-control" placeholder="https://linkedin.com/in/yourname">
+                            </div>
+                        </section>
+
+                        <!-- Professional Summary -->
+                        <section class="form-section" id="summary-section">
+                            <h3>Professional Summary</h3>
+                            <div class="form-group">
+                                <label for="summary" class="form-label">Professional Summary</label>
+                                <textarea id="summary" name="summary" class="form-control" rows="4" 
+                                          placeholder="Write a compelling 3-4 line summary highlighting your key strengths and career goals..."></textarea>
+                                <small class="char-counter">0/400 characters</small>
+                            </div>
+                        </section>
+
+                        <!-- Work Experience -->
+                        <section class="form-section" id="experience-section">
+                            <h3>Work Experience</h3>
+                            <div id="experience-container">
+                                <div class="experience-item">
+                                    <div class="form-group">
+                                        <label class="form-label">Job Title *</label>
+                                        <input type="text" name="jobTitle" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Company Name *</label>
+                                        <input type="text" name="company" class="form-control" required>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Start Date</label>
+                                            <input type="month" name="startDate" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">End Date</label>
+                                            <input type="month" name="endDate" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" name="currentJob"> Currently employed here
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Key Achievements</label>
+                                        <textarea name="achievements" class="form-control" rows="3" 
+                                                  placeholder="• Increased sales by 25% through strategic client outreach&#10;• Led a team of 8 developers on critical project delivery&#10;• Implemented new processes that reduced costs by $50K annually"></textarea>
+                                    </div>
+                                    <button type="button" class="btn btn--outline btn--sm remove-experience">Remove</button>
+                                </div>
+                            </div>
+                            <button type="button" id="add-experience" class="btn btn--secondary">+ Add Experience</button>
+                        </section>
+
+                        <!-- Education -->
+                        <section class="form-section" id="education-section">
+                            <h3>Education</h3>
+                            <div id="education-container">
+                                <div class="education-item">
+                                    <div class="form-group">
+                                        <label class="form-label">Degree *</label>
+                                        <input type="text" name="degree" class="form-control" placeholder="Bachelor of Science in Computer Science" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Institution *</label>
+                                        <input type="text" name="institution" class="form-control" required>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Start Year</label>
+                                            <input type="number" name="startYear" class="form-control" min="1950" max="2030">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Graduation Year</label>
+                                            <input type="number" name="graduationYear" class="form-control" min="1950" max="2030">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">GPA (Optional)</label>
+                                            <input type="number" name="gpa" class="form-control" step="0.01" min="0" max="4.0" placeholder="3.5">
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn--outline btn--sm remove-education">Remove</button>
+                                </div>
+                            </div>
+                            <button type="button" id="add-education" class="btn btn--secondary">+ Add Education</button>
+                        </section>
+
+                        <!-- Skills -->
+                        <section class="form-section" id="skills-section">
+                            <h3>Skills</h3>
+                            <div id="skills-container">
+                                <div class="skill-item">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Skill</label>
+                                            <input type="text" name="skillName" class="form-control" placeholder="JavaScript">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Category</label>
+                                            <select name="skillCategory" class="form-control">
+                                                <option value="Technical Skills">Technical Skills</option>
+                                                <option value="Software Proficiency">Software Proficiency</option>
+                                                <option value="Programming Languages">Programming Languages</option>
+                                                <option value="Communication">Communication</option>
+                                                <option value="Leadership">Leadership</option>
+                                                <option value="Project Management">Project Management</option>
+                                                <option value="Languages">Languages</option>
+                                                <option value="Industry-Specific">Industry-Specific</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Level</label>
+                                            <select name="skillLevel" class="form-control">
+                                                <option value="Beginner">Beginner</option>
+                                                <option value="Intermediate">Intermediate</option>
+                                                <option value="Advanced">Advanced</option>
+                                                <option value="Expert">Expert</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn--outline btn--sm remove-skill">Remove</button>
+                                </div>
+                            </div>
+                            <button type="button" id="add-skill" class="btn btn--secondary">+ Add Skill</button>
+                        </section>
+
+                        <!-- Optional Sections -->
+                        <section class="form-section" id="optional-section">
+                            <h3>Additional Information (Optional)</h3>
+                            
+                            <div class="form-group">
+                                <label for="certifications" class="form-label">Certifications</label>
+                                <textarea id="certifications" name="certifications" class="form-control" rows="3" 
+                                          placeholder="• AWS Certified Solutions Architect (2023)&#10;• PMP Certification (2022)&#10;• Google Analytics Certified"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="projects" class="form-label">Notable Projects</label>
+                                <textarea id="projects" name="projects" class="form-control" rows="3" 
+                                          placeholder="• E-commerce Platform - Led development of scalable platform serving 10K+ users&#10;• Data Analytics Dashboard - Built real-time dashboard reducing reporting time by 60%"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="languages" class="form-label">Languages</label>
+                                <textarea id="languages" name="languages" class="form-control" rows="2" 
+                                          placeholder="• English (Native)&#10;• Spanish (Conversational)&#10;• French (Basic)"></textarea>
+                            </div>
+                        </section>
+
+                        <!-- Extra Sections (up to 4) -->
+                        <section class="form-section" id="extra-sections">
+                            <h3>Custom Sections</h3>
+                            <div id="extra-sections-container">
+                                <div class="extra-section-item">
+                                    <div class="form-group">
+                                        <label class="form-label">Section Title</label>
+                                        <input type="text" name="extraSectionTitle" class="form-control" placeholder="e.g. Volunteering, Publications">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Section Content</label>
+                                        <textarea name="extraSectionContent" class="form-control" rows="3" placeholder="• Description or list of items"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" id="add-extra-section" class="btn btn--secondary">+ Add Extra Section</button>
+                        </section>
+                    </form>
+
+                    <!-- Navigation and Actions -->
+                    <div class="form-navigation">
+                        <div class="section-nav">
+                            <button type="button" class="nav-btn active" data-section="contact-section">Contact</button>
+                            <button type="button" class="nav-btn" data-section="summary-section">Summary</button>
+                            <button type="button" class="nav-btn" data-section="experience-section">Experience</button>
+                            <button type="button" class="nav-btn" data-section="education-section">Education</button>
+                            <button type="button" class="nav-btn" data-section="skills-section">Skills</button>
+                            <button type="button" class="nav-btn" data-section="optional-section">Optional</button>
+                            <button type="button" class="nav-btn" data-section="extra-sections">Custom Sections</button>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="button" id="download-pdf" class="btn btn--primary btn--lg">Download PDF</button>
+                            <button type="button" id="download-txt" class="btn btn--secondary btn--lg">Download .txt (ATS)</button>
+                            <button type="button" id="collaborate-btn" class="btn btn--outline btn--lg" onclick="window.open('https://github.com/BarrileteChapin/ATS-Optimized-Resume-Builder/', '_blank')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                </svg>
+                                Collaborate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side - Preview -->
+                <div class="preview-container">
+                    <div class="preview-header">
+                        <h3>Live Preview</h3>
+                        <div class="ats-score">
+                            <span>ATS Score: </span>
+                            <span id="ats-score-value" class="score-value">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- ATS Guidelines -->
+                    <div class="ats-guidelines">
+                        <h4>ATS Optimization Tips</h4>
+                        <ul class="guidelines-list">
+                            <li>Use standard fonts (Arial, Calibri, Times New Roman)</li>
+                            <li>Include keywords from job description</li>
+                            <li>Use standard section headings</li>
+                            <li>Quantify achievements with numbers</li>
+                            <li>List experience in reverse chronological order</li>
+                        </ul>
+                    </div>
+
+                    <!-- CV Preview -->
+                    <div id="cv-preview" class="cv-preview classic-template">
+                        <!-- Preview content will be dynamically generated -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
